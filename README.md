@@ -99,34 +99,7 @@ The script is written in Python 3.
   - create user: `CREATE USER catalog;`
   - create password: `ALTER ROLE catalog WITH PASSWORD 'catalog'`
   - Grant priviledge to user on DB: `GRANT ALL ON DATABASE catalog TO catalog;`
-
-  - To load the data, use the command `psql -d news -f newsdata.sql`.
-
-      Here's what this command does:
-
-      - psql — the PostgreSQL command line program
-      - -d news — connect to the database named news which has been set up for you
-      - -f newsdata.sql — run the SQL statements in the file newsdata.sql
-
-        Running this command will connect to your installed database server and execute the SQL commands in the downloaded file, creating tables and populating them with data.
-
-        #### Structure of the Database:
-
-          - Database Name: `news`
-
-            The database includes three tables:
-
-            - The `authors` table includes information about the authors of articles.
-            - The `articles` table includes the articles themselves.
-            - The `log` table includes one entry for each time a user has accessed the site.
-
-        #### The connection to the Database:
-
-          - You'll want to use the psycopg2 Python module to connect your program to the database.
-
-            For instance:  `db=psycopg2.connect("dbname=news")`
-
-        
+  
 
 ## Deployment:
 
