@@ -1,24 +1,43 @@
-# **Linux Server Project.**
+# **Linux Server Project**
 
- The purpose of this project is to take a baseline installation of a Linux server and prepare it to host a web applications. We will secure our server from a number of attack vectors, install and configure a database server, and deploy one of our existing web applications onto it.
+ The purpose of this project is to take a baseline installation of a Linux server and prepare it to host a web applications.
 
- To complete this project, we'll use a Linux server instance on AWS (Amazon Lightsail).
+ We will do the following tasks:
+
+      1. Create an AWS account.
+      2. Create a new Lightsail instance.
+      3. Create a new `grader` user with `sudo` priviledges.
+      4. Remove login access through passwords (allow access through private key)
+      5. Remove `root` login access.
+      6. Secure our server from a number of attack vectors.
+      7. Install, Update and Upgrade all packages.
+      8. Install and configure a database server.
+      9. Deploy one of our existing web applications onto it.
+
+(See more details below under **The Environment**)
+
+## **SSH Login access for grader user from client**
+
+`ssh -i /Users/username/Downloads/Keypair-file.pem grader@34.220.60.51 -p 2200`
 
 ## **The Script**
 
 The script is written in Python 3.
 
-##### To execute the script, run: `python catalog.py`
+##### To execute the script, run: `python3 catalog.py`
 
 ## **The Environment**
 
 ### Ubuntu Linux server instance on Amazon Lightsail:
 
-  - A new lightsail instance was created on AWS
-  - A new User has been created for the grader: `grader`.
+      3. Create a new `grader` user with `sudo` priviledges.
+
           - `sudo adduser grader` From instance terminal.
           - `sudo cp /etc/sudoers.d/90-cloud-init-users /etc/sudoers.d/grader`
           - `sudo nano /etc/sudoers.d/grader` changed `ubuntus` to `grader`
+
+      4. Remove login access through passwords (allow access through private key only)
+
           - `sudo su - grader` to create files with right owner.
           - download key pairs file from AWS account
           - `cd grader`
@@ -36,6 +55,36 @@ The script is written in Python 3.
 
           - Video on how to access the server on a client app using key pairs:[AWS SSH Access](https://aws.amazon.com/premiumsupport/knowledge-center/new-user-accounts-linux-instance/)
 
+      5. Remove `root` login access:
+          - `sudo nano /etc/ssh/sshd_config`
+          - change `PermitRootLogin prohibit-password` to `PermitRootLogin no`
+          - Restart SSHD: `sudo service sshd restart `
+
+      6. Secure our server from a number of attack vectors:
+           Configure the Uncomplicated Firewall (UFW) to only allow incoming connections for SSH (port 2200), HTTP (port 80), and NTP (port 123):
+              - `sudo ufw default deny incoming`
+              - `sudo ufw default allow outgoing`
+              - `sudo ufw allow www`
+              - `sudo ufw allow ntp`
+              - `sudo ufw allow 2200/tcp`
+
+              - `sudo nano /etc/ssh/sshd_config` Change port 22 to 2200
+              - `sudo service sshd restart`
+              - `sudo ufw status verbose`
+              `ubuntu@ip-172-26-8-28:~$ sudo ufw status verbose
+                Status: active
+                Logging: on (low)
+                Default: deny (incoming), allow (outgoing), disabled (routed)
+                New profiles: skip
+
+                To                         Action      From
+                --                         ------      ----
+                80/tcp                     ALLOW IN    Anywhere
+                123                        ALLOW IN    Anywhere
+                2200/tcp                   ALLOW IN    Anywhere
+                80/tcp (v6)                ALLOW IN    Anywhere (v6)
+                123 (v6)                   ALLOW IN    Anywhere (v6)
+                2200/tcp (v6)              ALLOW IN    Anywhere (v6)`
 
 
   - Packages have been updated `sudo apt-get update`
@@ -83,11 +132,11 @@ The script is written in Python 3.
                   Custom	TCP	2200`
   - Install pip: `sudo apt install python-pip`
   - Install psycopg2: `sudo apt-get install python-psycopg2`
+  - Install Flask `sudo apt-get install python-flask`
   - Install Python setup tools: `sudo apt-get install python-setuptools`
   - Enable mod_wsgi: `sudo a2enmod wsgi`
   - Restart apache2: `sudo service apache2 restart`
-  - Install Git: `apt-get install git`
-
+  - Install Git: `sudo apt-get install git`
 
 
 ### PostgreSQL Database
@@ -99,7 +148,7 @@ The script is written in Python 3.
   - create user: `CREATE USER catalog;`
   - create password: `ALTER ROLE catalog WITH PASSWORD 'catalog'`
   - Grant priviledge to user on DB: `GRANT ALL ON DATABASE catalog TO catalog;`
-  
+
 
 ## Deployment:
 
@@ -111,43 +160,48 @@ The script is written in Python 3.
         `cd catalog`
         `sudo git clone https://github.com/terryrossi/catalog-new.git`
 
+  - Configure and Enable a New Virtual Host:
+      Create catalog.conf to edit: sudo nano /etc/apache2/sites-available/catalog.conf
+        `<VirtualHost *:80>
+                ServerName 34.220.60.51.xip.io
+                ServerAdmin terryrossi1@gmail.com
+                WSGIScriptAlias / /var/www/catalog/catalog.wsgi
+                <Directory /var/www/catalog/catalog/>
+                        Order allow,deny
+                        Allow from all
+                </Directory>
+                Alias /static /var/www/catalog/catalog/static
+                <Directory /var/www/catalog/catalog/static/>
+                        Order allow,deny
+                        Allow from all
+                </Directory>
+                ErrorLog ${APACHE_LOG_DIR}/error.log
+                LogLevel warn
+                CustomLog ${APACHE_LOG_DIR}/access.log combined
+          </VirtualHost>`
+
+      Create WSGI file
+        `sudo nano /var/www/catalog/catalog.wsgi`
+        `#!/usr/bin/python
+          import sys
+          import logging
+          logging.basicConfig(stream=sys.stderr)
+          sys.path.insert(0,"/var/www/catalog/")
+
+          from catalog import catalog as application
+          application.secret_key = '**************************.apps.googleusercontent.com'`
+
   - Configure Apache to handle requests using WSGI:
-        `sudo nano /etc/apache2/sites-enabled/000-default.conf`
-        Add `WSGIScriptAlias / /var/www/html/myapp.wsgi` before the closing line `</VirtualHost>`:
-            `<VirtualHost *:80>
-                  	# The ServerName directive sets the request scheme, hostname and port that
-                  	# the server uses to identify itself. This is used when creating
-                  	# redirection URLs. In the context of virtual hosts, the ServerName
-                  	# specifies what hostname must appear in the request's Host: header to
-                  	# match this virtual host. For the default virtual host (this file) this
-                  	# value is not decisive as it is used as a last resort host regardless.
-                  	# However, you must set it for any further virtual host explicitly.
-                  	#ServerName www.example.com
 
-                  	ServerAdmin webmaster@localhost
-                  	DocumentRoot /var/www/html
+        sudo a2dissite 000-default.conf
+        sudo a2ensite catalog.cong
+              Restart Apache: `sudo apache2ctl restart`
 
-                  	# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
-                  	# error, crit, alert, emerg.
-                  	# It is also possible to configure the loglevel for particular
-                  	# modules, e.g.
-                  	#LogLevel info ssl:warn
+        
 
-                  	ErrorLog ${APACHE_LOG_DIR}/error.log
-                  	CustomLog ${APACHE_LOG_DIR}/access.log combined
+        If there were errors, I used the command, as per the book:
 
-                  	# For most configuration files from conf-available/, which are
-                  	# enabled or disabled at a global level, it is possible to
-                  	# include a line for only one particular virtual host. For example the
-                  	# following line enables the CGI configuration for this host only
-                  	# after it has been globally disabled with "a2disconf".
-                  	#Include conf-available/serve-cgi-bin.conf
-                  	WSGIScriptAlias / /var/www/html/myapp.wsgi
-</VirtualHost>`
-        Restart Apache: `sudo apache2ctl restart`
-
-  - Create the WSGI file:
-        `sudo nano /var/www/html/catalog.wsgi`
+        sudo tail -f /var/log/apach2/error.log
 
 
 
