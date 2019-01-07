@@ -88,7 +88,7 @@ The script is written in Python 3.
 
 
   - Packages have been updated `sudo apt-get update`
-  - Packages have been upgraded `sudo apt-get upgrade`
+  - Packages have been upgraded `sudo apt-get dist-upgrade` (Trying to run just sudo apt-get update && sudo apt-get upgrade wont install packages kept back because apt-get upgrade by default does not try to install new packages (such as new kernel versions); from the man page: under no circumstances are currently installed packages removed, or packages not already installed retrieved and installed.[Reference](https://serverfault.com/questions/265410/ubuntu-server-message-says-packages-can-be-updated-but-apt-get-does-not-update)
   - finger installed `sudo apt-get install finger`
   - Python3 installed `sudo apt-get python python3`
   - Apache2 installed `sudo apt-get install apache2`
@@ -118,7 +118,6 @@ The script is written in Python 3.
   - Configure the Uncomplicated Firewall (UFW) to only allow incoming connections for SSH (port 2200), HTTP (port 80), and NTP (port 123):
             - `sudo ufw default deny incoming`
             - `sudo ufw default allow outgoing`
-            - `sudo ufw allow ssh`
             - `sudo ufw allow www`
             - `sudo ufw allow ntp`
             - `sudo ufw allow 2200/tcp`
@@ -126,10 +125,7 @@ The script is written in Python 3.
             - `sudo service sshd restart`
             - `sudo ufw status`
 
-            `Application	Protocol	Port range
-                  SSH	TCP	22
-                  HTTP	TCP	80
-                  Custom	TCP	2200`
+
   - Install pip: `sudo apt install python-pip`
   - Install psycopg2: `sudo apt-get install python-psycopg2`
   - Install Flask `sudo apt-get install python-flask`
@@ -197,7 +193,7 @@ The script is written in Python 3.
         sudo a2ensite catalog.cong
               Restart Apache: `sudo apache2ctl restart`
 
-        
+
 
         If there were errors, I used the command, as per the book:
 
