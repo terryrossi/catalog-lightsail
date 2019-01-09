@@ -198,4 +198,4 @@ session.add(product2)
 session.commit()
 
 
-print "added Categories!"
+print ("added Categories!")

@@ -2,6 +2,8 @@
 
  The purpose of this project is to take a baseline installation of a Linux server and prepare it to host a web applications.
 
+IP ADDRESS: 34.220.60.51 HTTP ADDRESS: http://www.34.220.60.51.xip.io
+
  We will do the following tasks:
 
       1. Create an AWS account.
@@ -53,8 +55,6 @@ The script is written in Python 3.
           - SSH login from client:
           `ssh -i /Users/username/Downloads/Keypair-file.pem grader@34.220.60.51.xip.io -p 2200`
 
-          - Video on how to access the server on a client app using key pairs:[AWS SSH Access](https://aws.amazon.com/premiumsupport/knowledge-center/new-user-accounts-linux-instance/)
-
       5. Remove `root` login access:
           - `sudo nano /etc/ssh/sshd_config`
           - change `PermitRootLogin prohibit-password` to `PermitRootLogin no`
@@ -88,33 +88,14 @@ The script is written in Python 3.
 
 
   - Packages have been updated `sudo apt-get update`
-  - Packages have been upgraded `sudo apt-get dist-upgrade` (Trying to run just sudo apt-get update && sudo apt-get upgrade wont install packages kept back because apt-get upgrade by default does not try to install new packages (such as new kernel versions); from the man page: under no circumstances are currently installed packages removed, or packages not already installed retrieved and installed.[Reference](https://serverfault.com/questions/265410/ubuntu-server-message-says-packages-can-be-updated-but-apt-get-does-not-update)
-  - finger installed `sudo apt-get install finger`
+  - Packages have been upgraded `sudo apt-get dist-upgrade` (Trying to run just sudo apt-get update && sudo apt-get upgrade wont install packages kept back because apt-get upgrade by default does not try to install new packages (such as new kernel versions); from the man page: under no circumstances are currently installed packages removed, or packages not already installed retrieved and installed.
+
+  - finger installed `sudo apt-get install finger` (not necessary)
   - Python3 installed `sudo apt-get python python3`
   - Apache2 installed `sudo apt-get install apache2`
   - Apache2 for wsgi python3 installed `sudo apt-get install libapache2-mod-wsgi-py3`
   - PostgreSql installed `sudo apt-get install postgresql`
-  - Set Server time to UTC:
-          1. `sudo apt install chrony`
-          2. make sure `server 169.254.169.123 prefer iburst` is present in `/etc/chrony/chrony.conf`
-          3. Restart the chrony service: `sudo /etc/init.d/chrony restart`
-          4. Verify that chrony is using the 169.254.169.123 IP address to synchronize the time: `chronyc sources -v`
-          5. Verify the time synchronization metrics: `chronyc tracking`
-          `ubuntu@ip-172-26-8-28:~$ chronyc tracking
-            Reference ID    : 169.254.169.123 (169.254.169.123)
-            Stratum         : 4
-            Ref time (UTC)  : Tue Dec 25 19:20:50 2018
-            System time     : 0.000000006 seconds slow of NTP time
-            Last offset     : +0.000044166 seconds
-            RMS offset      : 0.000041572 seconds
-            Frequency       : 12.203 ppm slow
-            Residual freq   : +0.093 ppm
-            Skew            : 0.154 ppm
-            Root delay      : 0.000470 seconds
-            Root dispersion : 0.000418 seconds
-            Update interval : 260.3 seconds
-            Leap status     : Normal`
-  - I found that second option much easier (`sudo dpkg-reconfigure tzdata`)
+  - Set Server time to UTC (`sudo dpkg-reconfigure tzdata`)
   - Configure the Uncomplicated Firewall (UFW) to only allow incoming connections for SSH (port 2200), HTTP (port 80), and NTP (port 123):
             - `sudo ufw default deny incoming`
             - `sudo ufw default allow outgoing`
@@ -125,8 +106,11 @@ The script is written in Python 3.
             - `sudo service sshd restart`
             - `sudo ufw status`
 
+  - Download the installer script: `wget https://bootstrap.pypa.io/get-pip.py`
+  - Install Pip2 (first): sudo python2 get-pip.py
+  - Install Pip3 (Second to use pip3 as pip): sudo python3 get-pip.py
 
-  - Install pip: `sudo apt install python-pip`
+  - Install pip using apt-get: `sudo apt-get install python-pip`
   - Install psycopg2: `sudo apt-get install python-psycopg2`
   - Install Flask `sudo apt-get install python-flask`
   - Install Python setup tools: `sudo apt-get install python-setuptools`
@@ -199,7 +183,20 @@ The script is written in Python 3.
 
         sudo tail -f /var/log/apach2/error.log
 
+  - Third party resources used in this Project:
 
+      [How to access AWS server from a client app SSH using key pairs](https://aws.amazon.com/premiumsupport/knowledge-center/new-user-accounts-linux-instance/)
+      [xip.io](http://xip.io/)
+      [Update/Upgrade packages](https://serverfault.com/questions/265410/ubuntu-server-message-says-packages-can-be-updated-but-apt-get-does-not-update)
+      [Correct Installation and Configuration of pip2 and pip3](https://www.gungorbudak.com/blog/2018/08/02/correct-installation-and-configuration-of-pip2-and-pip3/)
+      [How to use pip with Python 3.x alongside Python 2.x](https://stackoverflow.com/questions/11268501/how-to-use-pip-with-python-3-x-alongside-python-2-x)
+      [Ubuntu Database packages](https://packages.ubuntu.com/trusty/database/)
+      [Postgresql PSQL Documentation](https://www.postgresql.org/docs/9.4/app-psql.html)
+      [WSGI](https://wsgi.readthedocs.io/en/latest/)
+      [How to get started using the Flask framework](https://www.youtube.com/watch?v=MwZwr5Tvyxo)
+      [Deploying a flask web app on lightsail AWS](https://mudspringhiker.github.io/deploying-a-flask-web-app-on-lightsail-aws.html)
+      [How To Deploy a Flask Application on an Ubuntu VPS](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps)
+      [Configuring an Amazon Lightsail Instance to run a Flask Application and PostgreSQL Database](https://github.com/kotamichael/amazon-lightsail-server-configuration/blob/master/README.md#acknowledgments)
 
 
 ## Code Quality
