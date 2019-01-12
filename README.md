@@ -177,11 +177,20 @@ The script is written in Python 3.
         sudo a2ensite catalog.cong
               Restart Apache: `sudo apache2ctl restart`
 
+        - Run `python3 database_setup.py` to create all tables
+        - Run `python3 categories.py` to populate all tables
 
+### Application still not running: FileNotFoundError: [Errno 2] No such file or directory: 'client_secrets.json' ###
+
+
+Additional modifications to original application.py file:
+        - Lots of Issues with module not find due to use of `__init__.py` or because apache2 app on lightsail? So I added: `sys.path.append(“/var/www/catalog/catalog/”)` which fixes issue with database_setup module not found but still can't find `client_secrets.json`?!?
 
         If there were errors, I used the command, as per the book:
 
         sudo tail -f /var/log/apach2/error.log
+
+
 
   - Third party resources used in this Project:
 

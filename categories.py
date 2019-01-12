@@ -1,6 +1,6 @@
 
 import psycopg2
-from config import config
+from config import Config
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Product, User

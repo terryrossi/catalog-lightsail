@@ -1,7 +1,7 @@
 import os
 import sys
 import psycopg2
-from config import config
+from config import Config
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
