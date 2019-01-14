@@ -168,7 +168,7 @@ The script is written in Python 3.
           logging.basicConfig(stream=sys.stderr)
           sys.path.insert(0,"/var/www/catalog/")
 
-          from catalog import catalog as application
+          from catalog import app as application
           application.secret_key = '**************************.apps.googleusercontent.com'`
 
   - Configure Apache to handle requests using WSGI:
@@ -181,7 +181,8 @@ The script is written in Python 3.
         - Run `python3 categories.py` to populate all tables
 
 ### Application still not running: FileNotFoundError: [Errno 2] No such file or directory: 'client_secrets.json' ###
-
+fix: `THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+secret_json = os.path.join(THIS_FOLDER, 'client_secrets.json')`
 
 Additional modifications to original application.py file:
         - Lots of Issues with module not find due to use of `__init__.py` or because apache2 app on lightsail? So I added: `sys.path.append(“/var/www/catalog/catalog/”)` which fixes issue with database_setup module not found but still can't find `client_secrets.json`?!?

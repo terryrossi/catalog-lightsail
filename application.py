@@ -26,10 +26,13 @@ from flask import make_response
 import requests
 from functools import wraps
 
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+secret_json = os.path.join(THIS_FOLDER, 'client_secrets.json')
+
 app = Flask(__name__)
 
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open(secret_json, 'r').read())['web']['client_id']
 APPLICATION_NAME = "Catalog Application"
 
 engine = create_engine('postgresql://catalog:catalog@localhost/catalog')
@@ -151,7 +154,7 @@ def gconnect():
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets(secrets_json, scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
