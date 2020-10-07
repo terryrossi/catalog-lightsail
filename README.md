@@ -103,7 +103,8 @@ The script is written in Python 3.
             - `sudo ufw allow ntp`
             - `sudo ufw allow 2200/tcp`
             - `sudo nano /etc/ssh/sshd_config` Change port 22 to 2200
-            - `sudo service sshd restart`
+            - `sudo ufw enable`
+            - maybe `sudo service sshd restart`
             - `sudo ufw status`
 
   - Download the installer script: `wget https://bootstrap.pypa.io/get-pip.py`
