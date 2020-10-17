@@ -122,6 +122,9 @@ The script is written in Python 3.
 
 ### PostgreSQL Database
 
+`For database access the choice has been made to use SQLAlchemy instead of native SQL (psycopg2).
+So the import psycopg2 at the top isn't necessary.`
+
   - Do not allow remote connections: `sudo nano /etc/postgresql/9.5/main/pg_hba.conf`
       ... comment: `#host    all             all             ::1/128                 md5`
   - Access psql: `sudo su - postgres`
